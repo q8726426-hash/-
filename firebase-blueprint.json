@@ -1,0 +1,57 @@
+{
+  "entities": {
+    "settings": {
+      "title": "Site Settings",
+      "description": "Global configuration for the barbershop",
+      "type": "object",
+      "properties": {
+        "instagramUrl": { "type": "string", "description": "Link to Instagram profile" },
+        "phoneNumber": { "type": "string", "description": "Contact phone number" },
+        "autoReplyMessage": { "type": "string", "description": "Message for auto-reply" },
+        "admins": { "type": "array", "items": { "type": "string" }, "description": "List of admin emails" }
+      },
+      "required": ["instagramUrl", "phoneNumber"]
+    },
+    "services": {
+      "title": "Service",
+      "description": "A haircut or grooming service",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "price": { "type": "string" },
+        "duration": { "type": "string" },
+        "description": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["name", "price"]
+    },
+    "gallery": {
+      "title": "Gallery Item",
+      "description": "A photo in the gallery",
+      "type": "object",
+      "properties": {
+        "url": { "type": "string" },
+        "type": { "type": "string", "enum": ["normal", "before_after"] },
+        "beforeUrl": { "type": "string" },
+        "afterUrl": { "type": "string" },
+        "title": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["url", "type"]
+    }
+  },
+  "firestore": {
+    "/settings/config": {
+      "schema": "settings",
+      "description": "Global site configuration"
+    },
+    "/services/{serviceId}": {
+      "schema": "services",
+      "description": "List of services"
+    },
+    "/gallery/{photoId}": {
+      "schema": "gallery",
+      "description": "Gallery photos"
+    }
+  }
+}

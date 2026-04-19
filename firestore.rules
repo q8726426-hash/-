@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: settings
+    // Document: config
+    // Fields:
+    //   - instagramUrl: string (required)
+    //   - phoneNumber: string (required)
+    //   - autoReplyMessage: string (optional)
+    //   - admins: list (required) - List of admin emails
+    //
+    // Collection: services
+    // Fields:
+    //   - name: string (required)
+    //   - price: string (required)
+    //   - duration: string (optional)
+    //   - description: string (optional)
+    //   - order: number (optional)
+    //
+    // Collection: gallery
+    // Fields:
+    //   - url: string (required)
+    //   - type: string (required, enum: ['normal', 'before_after'])
+    //   - beforeUrl: string (optional)
+    //   - afterUrl: string (optional)
+    //   - title: string (optional)
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email == "q8726426@gmail.com" || 
+         (exists(/databases/$(database)/documents/settings/config) && 
+          get(/databases/$(database)/documents/settings/config).data.admins.hasAny([request.auth.token.email])));
+    }
+
+    function isValidString(val, min, max) {
+      return val is string && val.size() >= min && val.size() <= max;
+    }
+
+    // Settings
+    match /settings/config {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Services
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Gallery
+    match /gallery/{photoId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
